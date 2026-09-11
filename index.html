@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Pink Music Box AI</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Pretendard", "Noto Sans KR", sans-serif;
+    background:
+        radial-gradient(circle at top left, #ffd6e8, transparent 35%),
+        linear-gradient(135deg, #fff0f7, #ffc4dd);
+    min-height: 100vh;
+    color: #63334d;
+}
+
+.container {
+    width: min(1000px, 94%);
+    margin: 40px auto;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo {
+    font-size: 48px;
+    margin-bottom: 5px;
+}
+
+h1 {
+    margin: 0;
+    color: #d94f87;
+    font-size: 36px;
+}
+
+.subtitle {
+    color: #9c607c;
+}
+
+.card {
+    background: rgba(255,255,255,0.78);
+    backdrop-filter: blur(12px);
+    border-radius: 25px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(180,80,130,0.15);
+    border: 1px solid rgba(255,255,255,0.8);
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #ffd0e2;
+    border-radius: 14px;
+    outline: none;
+    background: #fffafd;
+    color: #63334d;
+    font-size: 15px;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #ed75a5;
+}
+
+textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+button {
+    border: none;
+    border-radius: 14px;
+    padding: 13px 20px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+.main-btn {
+    width: 100%;
+    margin-top: 18px;
+    background: linear-gradient(135deg, #ed6398, #d83f7c);
+    color: white;
+    font-size: 17px;
+}
+
+.secondary {
+    background: #ffe0ec;
+    color: #b83f70;
+}
+
+.dark {
+    background: #9b416b;
+    color: white;
+}
+
+.song-title {
+    text-align: center;
+    color: #d94f87;
+}
+
+.visualizer {
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 20px 0;
+}
+
+.bar {
+    width: 7px;
+    height: 20px;
+    border-radius: 10px;
+    background: #ed75a5;
+    transition: height 0.15s;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.note-preview {
+    margin-top: 20px;
+    padding: 15px;
+    background: #fff2f8;
+    border-radius: 15px;
+    font-family: monospace;
+    color: #b94c7b;
+    word-break: break-word;
+}
+
+.saved-list {
+    display: grid;
+    gap: 10px;
+}
+
+.saved-song {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: #fff5f9;
+    padding: 13px;
+    border-radius: 14px;
+}
+
+.saved-song strong {
+    color: #b83f70;
+}
+
+.small-buttons {
+    display: flex;
+    gap: 5px;
+}
+
+.small-buttons button {
+    padding: 8px 10px;
+    font-size: 12px;
+}
+
+footer {
+    text-align: center;
+    color: #a36b84;
+    padding: 30px;
+}
+
+@media(max-width: 650px) {
+    .row {
+        grid-template-columns: 1fr;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+
+    .saved-song {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+    <div class="logo">🎀🎵</div>
+    <h1>Pink Music Box AI</h1>
+    <p class="subtitle">
+        키워드를 입력하면 나만의 오르골 음악을 만들어줘요
+    </p>
+</header>
+
+
+<!-- 작곡 영역 -->
+<div class="card">
+
+    <label>🎼 곡 제목</label>
+    <input
+        id="title"
+        placeholder="예: 별빛 아래에서"
+        value="나만의 오르골"
+    >
+
+    <br><br>
+
+    <label>✨ 작곡 키워드</label>
+
+    <textarea
+        id="keywords"
+        placeholder="예: 별, 밤하늘, 꿈, 사랑, 따뜻함"
+    ></textarea>
+
+    <div class="row">
+
+        <div>
+            <label>🎵 분위기</label>
+            <select id="mood">
+                <option value="dreamy">몽환적인</option>
+                <option value="happy">행복한</option>
+                <option value="sad">조용하고 슬픈</option>
+                <option value="romantic">로맨틱한</option>
+                <option value="fantasy">동화 같은</option>
+            </select>
+        </div>
+
+        <div>
+            <label>⏱️ 속도</label>
+            <select id="tempo">
+                <option value="slow">느리게</option>
+                <option value="normal" selected>보통</option>
+                <option value="fast">빠르게</option>
+            </select>
+        </div>
+
+    </div>
+
+    <button class="main-btn" onclick="compose()">
+        ✨ AI 오르골 작곡하기
+    </button>
+
+</div>
+
+
+<!-- 플레이어 -->
+<div class="card">
+
+    <h2 class="song-title" id="currentTitle">
+        아직 작곡된 곡이 없어요
+    </h2>
+
+    <div class="visualizer" id="visualizer">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+    </div>
+
+    <div class="controls">
+
+        <button class="dark" onclick="playSong()">
+            ▶️ 재생
+        </button>
+
+        <button class="secondary" onclick="stopSong()">
+            ⏹️ 정지
+        </button>
+
+        <button class="secondary" onclick="saveSong()">
+            💾 저장
+        </button>
+
+        <button class="secondary" onclick="downloadWav()">
+            📥 WAV 다운로드
+        </button>
+
+    </div>
+
+    <div class="note-preview" id="notePreview">
+        작곡하면 음표가 여기에 표시됩니다.
+    </div>
+
+</div>
+
+
+<!-- 저장된 곡 -->
+<div class="card">
+
+    <h2>💗 내 음악 보관함</h2>
+
+    <div class="saved-list" id="savedList">
+        저장된 곡이 없습니다.
+    </div>
+
+</div>
+
+<footer>
+    Pink Music Box AI · 나만의 작은 오르골 작곡실 🎀
+</footer>
+
+</div>
+
+
+<script>
+
+let currentSong = null;
+let audioContext = null;
+let currentSource = null;
+
+const notes = {
+    C4: 261.63,
+    D4: 293.66,
+    E4: 329.63,
+    F4: 349.23,
+    G4: 392.00,
+    A4: 440.00,
+    B4: 493.88,
+
+    C5: 523.25,
+    D5: 587.33,
+    E5: 659.25,
+    F5: 698.46,
+    G5: 783.99,
+    A5: 880.00,
+    B5: 987.77
+};
+
+
+/*
+    키워드 기반 AI 작곡
+
+    실제 AI API를 연결하기 전에는
+    브라우저에서 키워드를 분석하여
+    분위기에 맞는 멜로디를 생성합니다.
+*/
+
+function compose() {
+
+    const title =
+        document.getElementById("title").value ||
+        "나만의 오르골";
+
+    const keywords =
+        document.getElementById("keywords").value
+        .toLowerCase();
+
+    const mood =
+        document.getElementById("mood").value;
+
+    const tempo =
+        document.getElementById("tempo").value;
+
+
+    let melody;
+
+
+    if (
+        keywords.includes("별") ||
+        keywords.includes("밤") ||
+        keywords.includes("달") ||
+        keywords.includes("꿈")
+    ) {
+
+        melody = [
+            "C5","E5","G5","E5",
+            "D5","F5","A5","F5",
+            "E5","G5","B5","G5",
+            "C5","B4","A4","G4"
+        ];
+
+    } else if (
+        keywords.includes("사랑") ||
+        keywords.includes("로맨스") ||
+        keywords.includes("연인")
+    ) {
+
+        melody = [
+            "C5","E5","D5","G5",
+            "E5","D5","C5","A4",
+            "C5","E5","G5","A5",
+            "G5","E5","D5","C5"
+        ];
+
+    } else if (
+        keywords.includes("슬픔") ||
+        keywords.includes("비") ||
+        keywords.includes("눈물")
+    ) {
+
+        melody = [
+            "A4","C5","E5","D5",
+            "C5","B4","A4","G4",
+            "A4","C5","D5","E5",
+            "D5","C5","B4","A4"
+        ];
+
+    } else {
+
+        melody = [
+            "C5","D5","E5","G5",
+            "E5","D5","C5","G4",
+            "C5","E5","G5","A5",
+            "G5","E5","D5","C5"
+        ];
+
+    }
+
+
+    // 분위기에 따라 음표를 조금씩 변형
+    if (mood === "sad") {
+        melody = melody.map((note, i) => {
+            if (i % 4 === 2) return "A4";
+            return note;
+        });
+    }
+
+    if (mood === "happy") {
+        melody = melody.map((note, i) => {
+            if (i % 5 === 0) return "G5";
+            return note;
+        });
+    }
+
+
+    let duration = 0.55;
+
+    if (tempo === "slow") {
+        duration = 0.75;
+    }
+
+    if (tempo === "fast") {
+        duration = 0.35;
+    }
+
+
+    currentSong = {
+        title,
+        keywords,
+        mood,
+        tempo,
+        melody,
+        duration,
+        createdAt: new Date().toLocaleString()
+    };
+
+
+    document.getElementById("currentTitle")
+        .textContent = "🎵 " + title;
+
+    document.getElementById("notePreview")
+        .textContent =
+        melody.join("  →  ");
+
+    alert("✨ 새로운 오르골 곡이 완성되었습니다!");
+
+}
+
+
+function createMusicContext() {
+
+    if (!audioContext) {
+        audioContext =
+            new (window.AudioContext ||
+            window.webkitAudioContext)();
+    }
+
+    return audioContext;
+}
+
+
+function playNote(ctx, frequency, start, duration) {
+
+    const oscillator =
+        ctx.createOscillator();
+
+    const gain =
+        ctx.createGain();
+
+    /*
+        오르골 느낌을 위해
+        아주 짧은 Attack과 긴 Release를 사용
+    */
+
+    oscillator.type = "sine";
+
+    oscillator.frequency.value =
+        frequency;
+
+    gain.gain.setValueAtTime(
+        0,
+        start
+    );
+
+    gain.gain.linearRampToValueAtTime(
+        0.35,
+        start + 0.015
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.001,
+        start + duration
+    );
+
+    oscillator.connect(gain);
+    gain.connect(ctx.destination);
+
+    oscillator.start(start);
+
+    oscillator.stop(
+        start + duration
+    );
+}
+
+
+async function playSong() {
+
+    if (!currentSong) {
+        alert("먼저 AI 작곡하기를 눌러주세요.");
+        return;
+    }
+
+    stopSong();
+
+    const ctx = createMusicContext();
+
+    if (ctx.state === "suspended") {
+        await ctx.resume();
+    }
+
+    let time = ctx.currentTime + 0.1;
+
+    currentSong.melody.forEach(note => {
+
+        playNote(
+            ctx,
+            notes[note],
+            time,
+            currentSong.duration
+        );
+
+        time += currentSong.duration;
+
+    });
+
+    animateVisualizer();
+}
+
+
+function stopSong() {
+
+    if (audioContext) {
+        audioContext.close();
+        audioContext = null;
+    }
+
+}
+
+
+function animateVisualizer() {
+
+    const bars =
+        document.querySelectorAll(".bar");
+
+    let count = 0;
+
+    const timer =
+        setInterval(() => {
+
+            if (!currentSong) {
+                clearInterval(timer);
+                return;
+            }
+
+            bars.forEach(bar => {
+
+                const height =
+                    15 + Math.random() * 75;
+
+                bar.style.height =
+                    height + "px";
+
+            });
+
+            count++;
+
+            if (count > 80) {
+                clearInterval(timer);
+
+                bars.forEach(bar => {
+                    bar.style.height = "20px";
+                });
+            }
+
+        }, 150);
+}
+
+
+/*
+    localStorage에 곡 저장
+*/
+
+function saveSong() {
+
+    if (!currentSong) {
+        alert("저장할 곡이 없습니다.");
+        return;
+    }
+
+    let songs =
+        JSON.parse(
+            localStorage.getItem("pinkMusicBoxSongs")
+            || "[]"
+        );
+
+    songs.push(currentSong);
+
+    localStorage.setItem(
+        "pinkMusicBoxSongs",
+        JSON.stringify(songs)
+    );
+
+    loadSavedSongs();
+
+    alert("💗 음악이 저장되었습니다!");
+}
+
+
+function loadSavedSongs() {
+
+    const list =
+        document.getElementById("savedList");
+
+    const songs =
+        JSON.parse(
+            localStorage.getItem("pinkMusicBoxSongs")
+            || "[]"
+        );
+
+    if (songs.length === 0) {
+
+        list.innerHTML =
+            "저장된 곡이 없습니다.";
+
+        return;
+    }
+
+
+    list.innerHTML = "";
+
+
+    songs.forEach((song, index) => {
+
+        const div =
+            document.createElement("div");
+
+        div.className =
+            "saved-song";
+
+        div.innerHTML = `
+
+            <div>
+                <strong>🎵 ${escapeHtml(song.title)}</strong>
+                <br>
+                <small>
+                    ${escapeHtml(song.keywords || "키워드 없음")}
+                </small>
+            </div>
+
+            <div class="small-buttons">
+
+                <button
+                    class="secondary"
+                    onclick="loadSong(${index})">
+                    ▶ 불러오기
+                </button>
+
+                <button
+                    class="secondary"
+                    onclick="deleteSong(${index})">
+                    🗑 삭제
+                </button>
+
+            </div>
+        `;
+
+        list.appendChild(div);
+
+    });
+
+}
+
+
+function loadSong(index) {
+
+    const songs =
+        JSON.parse(
+            localStorage.getItem("pinkMusicBoxSongs")
+            || "[]"
+        );
+
+    currentSong = songs[index];
+
+    document.getElementById("title")
+        .value = currentSong.title;
+
+    document.getElementById("keywords")
+        .value = currentSong.keywords;
+
+    document.getElementById("mood")
+        .value = currentSong.mood;
+
+    document.getElementById("tempo")
+        .value = currentSong.tempo;
+
+    document.getElementById("currentTitle")
+        .textContent =
+        "🎵 " + currentSong.title;
+
+    document.getElementById("notePreview")
+        .textContent =
+        currentSong.melody.join(" → ");
+
+}
+
+
+function deleteSong(index) {
+
+    let songs =
+        JSON.parse(
+            localStorage.getItem("pinkMusicBoxSongs")
+            || "[]"
+        );
+
+    songs.splice(index, 1);
+
+    localStorage.setItem(
+        "pinkMusicBoxSongs",
+        JSON.stringify(songs)
+    );
+
+    loadSavedSongs();
+
+}
+
+
+/*
+    WAV 파일 생성
+*/
+
+async function downloadWav() {
+
+    if (!currentSong) {
+        alert("먼저 곡을 만들어주세요.");
+        return;
+    }
+
+
+    const sampleRate = 44100;
+
+    const seconds =
+        currentSong.melody.length *
+        currentSong.duration + 1;
+
+
+    const offline =
+        new OfflineAudioContext(
+            1,
+            sampleRate * seconds,
+            sampleRate
+        );
+
+
+    let time = 0;
+
+
+    currentSong.melody.forEach(note => {
+
+        const oscillator =
+            offline.createOscillator();
+
+        const gain =
+            offline.createGain();
+
+        oscillator.type = "sine";
+
+        oscillator.frequency.value =
+            notes[note];
+
+        gain.gain.setValueAtTime(
+            0,
+            time
+        );
+
+        gain.gain.linearRampToValueAtTime(
+            0.35,
+            time + 0.015
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            0.001,
+            time + currentSong.duration
+        );
+
+        oscillator.connect(gain);
+        gain.connect(offline.destination);
+
+        oscillator.start(time);
+
+        oscillator.stop(
+            time + currentSong.duration
+        );
+
+        time += currentSong.duration;
+
+    });
+
+
+    const rendered =
+        await offline.startRendering();
+
+
+    const wav =
+        audioBufferToWav(rendered);
+
+
+    const blob =
+        new Blob(
+            [wav],
+            {type: "audio/wav"}
+        );
+
+
+    const url =
+        URL.createObjectURL(blob);
+
+    const a =
+        document.createElement("a");
+
+    a.href = url;
+
+    a.download =
+        currentSong.title + ".wav";
+
+    a.click();
+
+    URL.revokeObjectURL(url);
+
+}
+
+
+/*
+    AudioBuffer → WAV
+*/
+
+function audioBufferToWav(buffer) {
+
+    const numChannels =
+        buffer.numberOfChannels;
+
+    const sampleRate =
+        buffer.sampleRate;
+
+    const length =
+        buffer.length * numChannels * 2 + 44;
+
+    const arrayBuffer =
+        new ArrayBuffer(length);
+
+    const view =
+        new DataView(arrayBuffer);
+
+
+    function writeString(offset, string) {
+
+        for (let i = 0; i < string.length; i++) {
+
+            view.setUint8(
+                offset + i,
+                string.charCodeAt(i)
+            );
+
+        }
+
+    }
+
+
+    writeString(0, "RIFF");
+
+    view.setUint32(
+        4,
+        36 + buffer.length * numChannels * 2,
+        true
+    );
+
+    writeString(8, "WAVE");
+
+    writeString(12, "fmt ");
+
+    view.setUint32(16, 16, true);
+
+    view.setUint16(20, 1, true);
+
+    view.setUint16(
+        22,
+        numChannels,
+        true
+    );
+
+    view.setUint32(
+        24,
+        sampleRate,
+        true
+    );
+
+    view.setUint32(
+        28,
+        sampleRate * numChannels * 2,
+        true
+    );
+
+    view.setUint16(
+        32,
+        numChannels * 2,
+        true
+    );
+
+    view.setUint16(34, 16, true);
+
+    writeString(36, "data");
+
+    view.setUint32(
+        40,
+        buffer.length * numChannels * 2,
+        true
+    );
+
+
+    let offset = 44;
+
+    for (
+        let i = 0;
+        i < buffer.length;
+        i++
+    ) {
+
+        for (
+            let channel = 0;
+            channel < numChannels;
+            channel++
+        ) {
+
+            let sample =
+                buffer.getChannelData(channel)[i];
+
+            sample =
+                Math.max(-1, Math.min(1, sample));
+
+            view.setInt16(
+                offset,
+                sample < 0
+                    ? sample * 0x8000
+                    : sample * 0x7FFF,
+                true
+            );
+
+            offset += 2;
+        }
+    }
+
+    return arrayBuffer;
+}
+
+
+function escapeHtml(text) {
+
+    return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+
+
+loadSavedSongs();
+
+</script>
+
+</body>
+</html>
